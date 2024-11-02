@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const FormLayout = () => {
   const [showData, setShowData] = useState([]);
@@ -7,7 +7,7 @@ const FormLayout = () => {
     surname: "",
     email: "",
     check: false,
-    gender: "",
+    gender: "Male",
     hobby: [],
     note: "",
     status: "",
@@ -29,14 +29,51 @@ const FormLayout = () => {
       note: "",
       status: "",
     });
+    setErrors({});
+  };
+
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    let formErrors = {};
+
+    if (formData.name.length < 5) {
+      formErrors.name = "Name must be at least 5 characters.";
+    }
+    if (formData.surname.length < 5) {
+      formErrors.surname = "Surname must be at least 5 characters.";
+    }
+    if (!formData.email) {
+      formErrors.email = "Email is required.";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
+    ) {
+      formErrors.email = "Invalid email format.";
+    }
+    if (formData.hobby.length < 2) {
+      formErrors.hobby = "Please select at least 2 hobbies.";
+    }
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleClear();
-    setShowData([...showData, formData]);
+    if (validateForm()) {
+      setShowData([...showData, formData]);
+      handleClear();
+    }
   };
 
+
+  useEffect(() => {
+    if(formData.name.length > 0 &&  formData.surname.length > 0){
+    validateForm();
+    }
+  }, [formData]);
+
+  
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
     setFormData((prevData) => ({
@@ -51,48 +88,57 @@ const FormLayout = () => {
     <div className="bg-gray-100 h-auto min-h-screen">
       <div className="flex flex-col lg:flex-row ">
         {/* Form Section */}
-        <div className="w-full  lg:fixed ml-24 md:w-2/5 flex-shrink-0">
-          <div className="card bg-base-100 shadow-2xl mx-4 lg:mx-11 my-10 lg:my-20 p-8 lg:p-20 items-center">
+        <div className="  lg:fixed ml-12 md:w-3/6 flex-shrink-0">
+          <div className="card bg-base-100 shadow-2xl mx-4 lg:mx-11 my-10 w-3/4 lg:my-20 p-8 lg:p-20 items-center">
             <div className="pb-6 lg:pb-9 text-2xl lg:text-4xl">
               Profile Management
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <label className="input input-bordered flex items-center">
-                  Name
-                  <div className="divider divider-horizontal m-2"></div>
-                  <input
-                    type="text"
-                    className="grow"
-                    value={formData.name}
-                    placeholder="Type here"
-                    onChange={(e) =>
-                      setFormData((prevData) => ({
-                        ...prevData,
-                        name: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
+              <div className="mb-4 grid grid-cols-2 lg:gap-3">
+                <div>
+                  <label className="input input-bordered flex items-center">
+                    Name
+                    <div className="divider divider-horizontal m-2"></div>
+                    <input
+                      type="text"
+                      className="grow"
+                      value={formData.name}
+                      placeholder="Type here"
+                      onChange={(e) =>
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          name: e.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  )}
+                </div>
 
-                <label className="input input-bordered flex items-center">
-                  Surname
-                  <div className="divider divider-horizontal m-2 "></div>
-                  <input
-                    type="text"
-                    className="grow"
-                    value={formData.surname}
-                    placeholder="Type here"
-                    onChange={(e) =>
-                      setFormData((prevData) => ({
-                        ...prevData,
-                        surname: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
+                <div>
+                  <label className="input input-bordered flex items-center">
+                    Surname
+                    <div className="divider divider-horizontal m-2 "></div>
+                    <input
+                      type="text"
+                      className="grow"
+                      value={formData.surname}
+                      placeholder="Type here"
+                      onChange={(e) =>
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          surname: e.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                                    {errors.surname && (
+                    <p className="text-red-500 text-sm mt-1">{errors.surname}</p>
+                  )}
+                </div>
               </div>
-
               <div className="mb-4">
                 <label className="input input-bordered flex items-center">
                   Email
@@ -107,16 +153,20 @@ const FormLayout = () => {
                       setFormData((prevData) => ({
                         ...prevData,
                         email: email,
-                        emailValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+                        emailValid:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+                            email
+                          ),
                       }));
                     }}
                   />
                 </label>
-                {!formData.emailValid && formData.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Please enter a valid email.
-                  </p>
+                
+                <div class="error">
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
+                </div>
               </div>
               <div className="form-control">
                 <label className="cursor-pointer label w-fit gap-4 ml-2 mb-4">
@@ -136,67 +186,72 @@ const FormLayout = () => {
                 </label>
               </div>
 
-              <div className="mb-4">
-                <div className="grid grid-cols-2 gap-4 mb-1">
-                  <div className="mb-1">Gender</div>
-                  <div className="mb-1">Hobbies</div>
-                </div>
-
-                <div className="flex flex-wrap lg:flex-nowrap mb-5">
-                  {/* Gender */}
-                  <div className="w-full lg:w-1/2 flex mb-4 lg:mb-0">
-                    <label className="label gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="male"
-                        className="radio radio-primary"
-                        checked={formData.gender === "male"}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                      <span className="label-text">Male</span>
-                    </label>
-                    <label className="label gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="female"
-                        className="radio radio-primary"
-                        checked={formData.gender === "female"}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                      <span className="label-text">Female</span>
-                    </label>
-                    <label className="label gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="other"
-                        className="radio radio-primary"
-                        checked={formData.gender === "other"}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                      <span className="label-text">Other</span>
-                    </label>
+              {/* Gender */}
+              <div className="flex">
+                <div className="mb-4">
+                  <div className="flex flex-col">
+                    <div className="gap-4 mb-1">
+                      <div className="mb-1">Gender</div>
+                    </div>
+                    <div className="flex flex-wrap lg:flex-nowrap sm:text-lg">
+                      <div className="w-full lg:w-1/2 flex mb-4 lg:mb-0">
+                        <label className="label gap-1">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="male"
+                            className="radio radio-primary"
+                            checked={formData.gender === "male"}
+                            onChange={(e) =>
+                              setFormData((prevData) => ({
+                                ...prevData,
+                                [e.target.name]: e.target.value,
+                              }))
+                            }
+                          />
+                          <span className="label-text">Male</span>
+                        </label>
+                        <label className="label gap-1">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="female"
+                            className="radio radio-primary"
+                            checked={formData.gender === "female"}
+                            onChange={(e) =>
+                              setFormData((prevData) => ({
+                                ...prevData,
+                                [e.target.name]: e.target.value,
+                              }))
+                            }
+                          />
+                          <span className="label-text">Female</span>
+                        </label>
+                        <label className="label gap-1">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="other"
+                            className="radio radio-primary"
+                            checked={formData.gender === "other"}
+                            onChange={(e) =>
+                              setFormData((prevData) => ({
+                                ...prevData,
+                                [e.target.name]: e.target.value,
+                              }))
+                            }
+                          />
+                          <span className="label-text">Other</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
+                </div>
+                {/* Hobbies */}
 
-                  {/* Hobbies */}
-                  <div className="w-full lg:w-1/2 flex flex-wrap">
+                <div className="lg:m-auto">
+                  <div className="mb-1">Hobbies</div>
+                  <div className="flex flex-wrap lg:flex-nowrap mb-5 sm:text-lg">
                     <label className="label cursor-pointer gap-1">
                       <input
                         type="checkbox"
@@ -294,17 +349,17 @@ const FormLayout = () => {
                     formData.surname.length >= 5 &&
                     formData.emailValid &&
                     formData.hobby.length >= 2
-                      ? ""
-                      : "btn-disabled"
+                    // ? ""
+                    // : "btn-disabled"
                   }`}
-                  disabled={
-                    !(
-                      formData.name.length >= 6 &&
-                      formData.surname.length >= 5 &&
-                      formData.emailValid &&
-                      formData.hobby.length >= 2
-                    )
-                  }
+                  // disabled={
+                  //   !(
+                  //     formData.name.length >= 6 &&
+                  //     formData.surname.length >= 5 &&
+                  //     formData.emailValid &&
+                  //     formData.hobby.length >= 2
+                  //   )
+                  // }
                 >
                   Submit
                 </button>
