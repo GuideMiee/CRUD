@@ -118,26 +118,6 @@ const FormLayout = () => {
                   </p>
                 )}
               </div>
-
-              {/* <div className="mb-4">
-                <label className="input input-bordered flex items-center">
-                  Email
-                  <div className="divider divider-horizontal m-2 "></div>
-                  <input
-                    type="text"
-                    className="grow"
-                    value={formData.email}
-                    placeholder="Your@site.com"
-                    onChange={(e) =>
-                      setFormData((prevData) => ({
-                        ...prevData,
-                        email: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div> */}
-
               <div className="form-control">
                 <label className="cursor-pointer label w-fit gap-4 ml-2 mb-4">
                   <input
@@ -312,7 +292,7 @@ const FormLayout = () => {
                   className={`btn btn-primary ${
                     formData.name.length >= 6 &&
                     formData.surname.length >= 5 &&
-                    formData.emailValid  &&
+                    formData.emailValid &&
                     formData.hobby.length >= 2
                       ? ""
                       : "btn-disabled"
@@ -321,7 +301,7 @@ const FormLayout = () => {
                     !(
                       formData.name.length >= 6 &&
                       formData.surname.length >= 5 &&
-                      formData.emailValid  &&
+                      formData.emailValid &&
                       formData.hobby.length >= 2
                     )
                   }
